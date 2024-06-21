@@ -1,7 +1,7 @@
 
 const Product= require("../models/product");
 const getAllProducts=async(req,res)=>{
-const prodData= await Product.find({category:"mobile"})
+const prodData= await Product.find({})
 res.status(200).json({prodData})
 };
 
