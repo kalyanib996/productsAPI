@@ -12,34 +12,40 @@ const Product = require("./models/product");
 const productData = require("./models/products.json");
 
 app.use(cors());
+app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send("Liveee");
 });
 
-// middleware
 app.use("/api/products", products_routes);
 
 const start = async () => {
   try {
     await dbConnection();
+
     console.log("DB connected!");
 
-    // Seed products only when the collection is empty
     const productCount = await Product.countDocuments();
 
+    console.log(`Current product count: ${productCount}`);
+
     if (productCount === 0) {
-      await Product.insertMany(productData);
-      console.log(`${productData.length} products added to database`);
+      const insertedProducts = await Product.insertMany(productData);
+
+      console.log(
+        `${insertedProducts.length} products successfully added to MongoDB`
+      );
     } else {
-      console.log(`Products already exist: ${productCount}`);
+      console.log("Products already exist. Skipping seed.");
     }
 
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Listening on port ${PORT}`);
     });
   } catch (error) {
-    console.log(`something went wrong ${error}`);
+    console.error("Something went wrong:", error);
+    process.exit(1);
   }
 };
 
